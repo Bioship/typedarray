@@ -117,17 +117,17 @@ function unpackU8(bytes) { return as_unsigned(bytes[0], 8); }
 
 function packU8Clamped(n) { n = round(Number(n)); return [n < 0 ? 0 : n > 0xff ? 0xff : n & 0xff]; }
 
-function packI16(n) { return [(n >> 8) & 0xff, n & 0xff]; }
-function unpackI16(bytes) { return as_signed(bytes[0] << 8 | bytes[1], 16); }
+function packI16(n) { return [n & 0xff, (n >> 8) & 0xff]; }
+function unpackI16(bytes) { return as_signed(bytes[1] << 8 | bytes[0], 16); }
 
-function packU16(n) { return [(n >> 8) & 0xff, n & 0xff]; }
-function unpackU16(bytes) { return as_unsigned(bytes[0] << 8 | bytes[1], 16); }
+function packU16(n) { return [n & 0xff, (n >> 8) & 0xff]; }
+function unpackU16(bytes) { return as_unsigned(bytes[1] << 8 | bytes[0], 16); }
 
-function packI32(n) { return [(n >> 24) & 0xff, (n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff]; }
-function unpackI32(bytes) { return as_signed(bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3], 32); }
+function packI32(n) { return [n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff]; }
+function unpackI32(bytes) { return as_signed(bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0], 32); }
 
-function packU32(n) { return [(n >> 24) & 0xff, (n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff]; }
-function unpackU32(bytes) { return as_unsigned(bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3], 32); }
+function packU32(n) { return [n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff]; }
+function unpackU32(bytes) { return as_unsigned(bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0], 32); }
 
 function packIEEE754(v, ebits, fbits) {
 
@@ -518,11 +518,7 @@ function packF32(v) { return packIEEE754(v, 8, 23); }
     return ECMAScript.IsCallable(array.get) ? array.get(index) : array[index];
   }
 
-  var IS_BIG_ENDIAN = (function() {
-    var u16array = new(exports.Uint16Array)([0x1234]),
-        u8array = new(exports.Uint8Array)(u16array.buffer);
-    return r(u8array, 0) === 0x12;
-  }());
+  var IS_BIG_ENDIAN = false;
 
   // Constructor(ArrayBuffer buffer,
   //             optional unsigned long byteOffset,
